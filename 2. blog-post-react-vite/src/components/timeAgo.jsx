@@ -7,8 +7,6 @@ const TimeAgo = ({ timestamp }) => {
     timeAgo = `${formatDistanceToNow(date)} ago`;
   }
 
-  console.log(timeAgo);
-
   return (
     <span title={timestamp}>
       <i>{timeAgo ?? "Unknown date"}</i>

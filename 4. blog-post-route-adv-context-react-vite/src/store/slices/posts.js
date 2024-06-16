@@ -17,7 +17,7 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
     const response = await axios.get(BASE_URL_API);
     return response.data;
   } catch (error) {
-    return error.message ?? `ERROR_TO_REQUEST ${BASE_URL_API}`;
+    return error.message ?? `ERROR_TO_REQUEST GET ${BASE_URL_API}`;
   }
 });
 
@@ -26,7 +26,7 @@ export const addNewPost = createAsyncThunk("posts/addNewPost", async (post) => {
     const response = await axios.post(BASE_URL_API, post);
     return response.data;
   } catch (error) {
-    return error.message ?? `ERROR_TO_REQUEST ${BASE_URL_API}`;
+    return error.message ?? `ERROR_TO_REQUEST POST ${BASE_URL_API}`;
   }
 });
 
@@ -35,9 +35,24 @@ export const editPost = createAsyncThunk("posts/editPost", async (post) => {
     const response = await axios.patch(`${BASE_URL_API}/${post.id}`, post);
     return response.data;
   } catch (error) {
-    return error.message ?? `ERROR_TO_REQUEST ${BASE_URL_API}`;
+    return error.message ?? `ERROR_TO_REQUEST PATCH ${BASE_URL_API}/${post.id}`;
   }
 });
+
+export const deletePost = createAsyncThunk(
+  "posts/deletePost",
+  async (postId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL_API}/${postId}`);
+      if (response.status === 200) {
+        return { id: postId };
+      }
+      throw new Error("couldn't to delete");
+    } catch (error) {
+      return error.message ?? `ERROR_TO_REQUEST DELETE ${BASE_URL_API}`;
+    }
+  }
+);
 
 export const posts = createSlice({
   name: "posts",
@@ -105,12 +120,15 @@ export const posts = createSlice({
         const { id } = action.payload;
         const updatedPost = state.posts.map((post) => {
           if (post.id === id) {
-            console.log(action.payload);
             return { ...post, ...action.payload };
           }
           return post;
         });
         state.posts = updatedPost;
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        const { id } = action.payload;
+        state.posts = state.posts.filter((post) => post.id !== Number(id));
       });
   },
 });
