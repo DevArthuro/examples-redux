@@ -1,37 +1,40 @@
 import { Form, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import SelectUserField from "../components/selectUserField";
-import { addNewPost, getPostsStatus } from "../store/slices/posts";
-import { useNavigate } from "react-router-dom";
+import { selectPostDetailById, editPost } from "../store/slices/posts";
+import { useNavigate, useParams } from "react-router-dom";
 
-const FormPost = () => {
+const EditFormPost = () => {
   const dispatch = useDispatch();
 
-  const status = useSelector(getPostsStatus);
+  const { postId } = useParams();
+  const post = useSelector((state) =>
+    selectPostDetailById(state, Number(postId))
+  );
+
   const navigate = useNavigate();
 
-  const saveNewPost = async (post) => {
-    const postCreated = await dispatch(addNewPost(post)).unwrap();
-    navigate(`/post/${postCreated.id}`);
+  if (!post) {
+    return <h1>Post Not Found</h1>;
+  }
+
+  const editFormPost = (valuesPost) => {
+    dispatch(editPost({ ...post, ...valuesPost }));
+    navigate(`/post/${postId}`);
   };
 
   const initialValues = {
-    title: "",
-    author: "",
-    body: "",
+    title: post.title,
+    userId: post.userId,
+    body: post.body,
   };
 
   return (
     <div>
       <Formik
         initialValues={initialValues}
-        onSubmit={(values, actions) => {
-          saveNewPost(values);
-          actions.resetForm({
-            values: {
-              ...initialValues,
-            },
-          });
+        onSubmit={(values, _) => {
+          editFormPost({ ...values, userId: Number(values.userId) });
         }}
       >
         {({ values, handleChange, handleSubmit }) => (
@@ -46,8 +49,8 @@ const FormPost = () => {
                 onChange={handleChange}
               />
               <br />
-              <label htmlFor="author">Author</label>
-              <SelectUserField name="author" />
+              <label htmlFor="userId">Author</label>
+              <SelectUserField name="userId" />
               <br />
               <label htmlFor="body">body</label>
               <textarea
@@ -57,9 +60,7 @@ const FormPost = () => {
                 onChange={handleChange}
               />
               <br />
-              <button type="submit" disabled={status === "loading"}>
-                Save
-              </button>
+              <button type="submit">Save</button>
             </Form>
           </>
         )}
@@ -67,5 +68,4 @@ const FormPost = () => {
     </div>
   );
 };
-
-export default FormPost;
+export default EditFormPost;

@@ -7,8 +7,10 @@ import store from "./store/index.js";
 import { fetchUsers } from "./store/slices/users.js";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { fetchPosts } from "./store/slices/posts.js";
 
 store.dispatch(fetchUsers());
+store.dispatch(fetchPosts());
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
