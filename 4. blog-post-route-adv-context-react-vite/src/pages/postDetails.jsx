@@ -1,5 +1,48 @@
+import { useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import { getPostsStatus, selectPostDetailById } from "../store/slices/posts";
+import TimeAgo from "../components/timeAgo";
+import ReactionButtons from "../components/reactionButtons";
+import { selectUserById } from "../store/slices/users";
+import AuthorPost from "../components/authorPost";
+
 const PostDetails = () => {
-  return <h1>Post details</h1>;
+  let content = "";
+
+  const { postId } = useParams();
+
+  const status = useSelector(getPostsStatus);
+
+  const post =
+    useSelector((state) => selectPostDetailById(state, Number(postId))) ?? null;
+
+  if (status === "loading") {
+    content = <div>Loading...</div>;
+  } else if (status === "succeeded") {
+    content = (
+      <article>
+        <h4>{post.title}</h4>
+        <p>{post.body}</p>
+        <p>
+          Author:{" "}
+          <i>
+            <AuthorPost userId={post.userId} />
+          </i>
+        </p>
+        <p>
+          Date: <TimeAgo timestamp={post.date} />
+        </p>
+        <ReactionButtons post={post} />
+        <Link to={`/post/edit/${postId}`}>Edit post</Link>
+      </article>
+    );
+  } else if (status === "failed") {
+    content = <div>Error to request</div>;
+  }
+  // if (!post) {
+  //   return <h1>Post Not Found</h1>;
+  // }
+  return <div>{content}</div>;
 };
 
 export default PostDetails;

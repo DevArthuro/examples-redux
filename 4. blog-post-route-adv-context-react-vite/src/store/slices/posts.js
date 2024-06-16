@@ -30,6 +30,15 @@ export const addNewPost = createAsyncThunk("posts/addNewPost", async (post) => {
   }
 });
 
+export const editPost = createAsyncThunk("posts/editPost", async (post) => {
+  try {
+    const response = await axios.patch(`${BASE_URL_API}/${post.id}`, post);
+    return response.data;
+  } catch (error) {
+    return error.message ?? `ERROR_TO_REQUEST ${BASE_URL_API}`;
+  }
+});
+
 export const posts = createSlice({
   name: "posts",
   initialState,
@@ -91,6 +100,17 @@ export const posts = createSlice({
       .addCase(addNewPost.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+      .addCase(editPost.fulfilled, (state, action) => {
+        const { id } = action.payload;
+        const updatedPost = state.posts.map((post) => {
+          if (post.id === id) {
+            console.log(action.payload);
+            return { ...post, ...action.payload };
+          }
+          return post;
+        });
+        state.posts = updatedPost;
       });
   },
 });
@@ -99,6 +119,10 @@ export default posts.reducer;
 
 // Selectors
 export const selectPosts = (state) => state.posts.posts;
+export const selectPostDetailById = (state, postId) => {
+  return state.posts.posts.find((post) => post.id === postId);
+};
+
 export const getPostsStatus = (state) => state.posts.status;
 export const getPostsError = (state) => state.posts.error;
 

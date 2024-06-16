@@ -2,13 +2,14 @@ import { useSelector } from "react-redux";
 import { selectUsers } from "../store/slices/users";
 import TimeAgo from "./timeAgo";
 import ReactionButtons from "./reactionButtons";
+import { Link } from "react-router-dom";
 
 const UniquePost = ({ post }) => {
   const users = useSelector(selectUsers);
   return (
     <article>
       <h4>{post.title}</h4>
-      <p>{post.body.substring(0, 100)}</p>
+      <p>{post.body.substring(0, 50)}</p>
       <p>
         Author:{" "}
         <i>
@@ -20,6 +21,7 @@ const UniquePost = ({ post }) => {
         Date: <TimeAgo timestamp={post.date} />
       </p>
       <ReactionButtons post={post} />
+      <Link to={`post/${post.id}`}>Ir al detalle</Link>
     </article>
   );
 };
