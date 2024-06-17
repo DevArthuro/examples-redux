@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   deletePost,
   getPostsStatus,
-  selectPostDetailById,
+  selectPostById,
 } from "../store/slices/posts";
 import TimeAgo from "../components/timeAgo";
 import ReactionButtons from "../components/reactionButtons";
@@ -16,8 +16,7 @@ const PostDetails = () => {
   const dispatch = useDispatch();
   const status = useSelector(getPostsStatus);
 
-  const post =
-    useSelector((state) => selectPostDetailById(state, Number(postId))) ?? null;
+  const post = useSelector((state) => selectPostById(state, postId));
 
   if (status === "loading") {
     content = <div>Loading...</div>;

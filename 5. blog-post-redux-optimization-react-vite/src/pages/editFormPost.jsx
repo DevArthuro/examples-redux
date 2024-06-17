@@ -1,16 +1,14 @@
 import { Form, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import SelectUserField from "../components/selectUserField";
-import { selectPostDetailById, editPost } from "../store/slices/posts";
+import { editPost, selectPostById } from "../store/slices/posts";
 import { useNavigate, useParams } from "react-router-dom";
 
 const EditFormPost = () => {
   const dispatch = useDispatch();
 
   const { postId } = useParams();
-  const post = useSelector((state) =>
-    selectPostDetailById(state, Number(postId))
-  );
+  const post = useSelector((state) => selectPostById(state, postId));
 
   const navigate = useNavigate();
 
