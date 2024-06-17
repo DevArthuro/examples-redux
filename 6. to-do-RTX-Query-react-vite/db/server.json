@@ -1,0 +1,52 @@
+{
+  "todos": [
+    {
+      "id": "7",
+      "userId": 6,
+      "title": "Preparar la cena",
+      "completed": true
+    },
+    {
+      "id": "8",
+      "userId": 7,
+      "title": "Leer un libro",
+      "completed": true
+    },
+    {
+      "id": "9",
+      "userId": 8,
+      "title": "Escribir un artículo",
+      "completed": false
+    },
+    {
+      "id": "10",
+      "userId": 2,
+      "title": "Hacer ejercicio",
+      "completed": true
+    },
+    {
+      "id": "11",
+      "userId": 9,
+      "title": "Pintar la habitación",
+      "completed": false
+    },
+    {
+      "id": "12",
+      "userId": 10,
+      "title": "Ir al supermercado",
+      "completed": true
+    },
+    {
+      "id": "13",
+      "userId": 3,
+      "title": "Reparar la bicicleta",
+      "completed": false
+    },
+    {
+      "id": "14",
+      "userId": 4,
+      "title": "Hacer la colada",
+      "completed": true
+    }
+  ]
+}
