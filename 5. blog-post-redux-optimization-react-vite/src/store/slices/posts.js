@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
 
 import { v4 as uuid } from "uuid";
 import { sub } from "date-fns";
@@ -137,11 +141,16 @@ export default posts.reducer;
 
 // Selectors
 export const selectPosts = (state) => state.posts.posts;
-export const selectPostDetailById = (state, postId) => {
-  return state.posts.posts.find((post) => post.id === postId);
-};
-export const selectPostsByUser = (state, userId) =>
-  state.posts.posts.filter((post) => post.userId === Number(userId));
+
+export const selectPostDetailById = createSelector(
+  [selectPosts, (_, postId) => postId],
+  (posts, postId) => posts.find((post) => post.id === postId)
+);
+
+export const selectPostsByUser = createSelector(
+  [selectPosts, (_, userId) => userId],
+  (posts, userId) => posts.filter((post) => post.userId === Number(userId))
+);
 
 export const getPostsStatus = (state) => state.posts.status;
 export const getPostsError = (state) => state.posts.error;
