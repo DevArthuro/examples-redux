@@ -3,9 +3,13 @@ import { selectUsers } from "../store/slices/users";
 import TimeAgo from "./timeAgo";
 import ReactionButtons from "./reactionButtons";
 import { Link } from "react-router-dom";
+import { selectPostById } from "../store/slices/posts";
 
-const UniquePost = ({ post }) => {
+const UniquePost = ({ postId }) => {
   const users = useSelector(selectUsers);
+
+  const post = useSelector((state) => selectPostById(state, postId));
+
   return (
     <article>
       <h4>{post.title}</h4>

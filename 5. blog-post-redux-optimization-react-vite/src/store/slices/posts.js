@@ -2,19 +2,23 @@ import {
   createSlice,
   createAsyncThunk,
   createSelector,
+  createEntityAdapter,
 } from "@reduxjs/toolkit";
 
-import { v4 as uuid } from "uuid";
 import { sub } from "date-fns";
 import axios from "axios";
 
 const BASE_URL_API = "https://jsonplaceholder.typicode.com/posts";
 
-const initialState = {
+const postsEntity = createEntityAdapter({
+  sortComparer: (a, b) => b.date.localeCompare(a.date),
+});
+
+const initialState = postsEntity.getInitialState({
   posts: [],
   status: "idle", // idle |	succeeded | loading | failed
   error: null,
-};
+});
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   try {
@@ -64,7 +68,7 @@ export const posts = createSlice({
   reducers: {
     enterReaction: (state, action) => {
       const { postId, reaction } = action.payload;
-      const existsPost = state.posts.find((post) => post.id === postId);
+      const existsPost = state.entities[postId];
       if (existsPost) {
         existsPost.reactions[reaction]++;
       }
@@ -90,7 +94,7 @@ export const posts = createSlice({
           return post;
         });
 
-        state.posts = loadedPost;
+        postsEntity.upsertMany(state, loadedPost);
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = "failed";
@@ -114,7 +118,7 @@ export const posts = createSlice({
           },
           date: new Date().toISOString(),
         };
-        state.posts.push(post);
+        postsEntity.addOne(state, post);
       })
       .addCase(addNewPost.rejected, (state, action) => {
         state.status = "failed";
@@ -122,17 +126,11 @@ export const posts = createSlice({
       })
       .addCase(editPost.fulfilled, (state, action) => {
         const { id } = action.payload;
-        const updatedPost = state.posts.map((post) => {
-          if (post.id === id) {
-            return { ...post, ...action.payload };
-          }
-          return post;
-        });
-        state.posts = updatedPost;
+        postsEntity.upsertOne(state, action.payload);
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         const { id } = action.payload;
-        state.posts = state.posts.filter((post) => post.id !== Number(id));
+        postsEntity.removeOne(state, id);
       });
   },
 });
@@ -140,15 +138,14 @@ export const posts = createSlice({
 export default posts.reducer;
 
 // Selectors
-export const selectPosts = (state) => state.posts.posts;
-
-export const selectPostDetailById = createSelector(
-  [selectPosts, (_, postId) => postId],
-  (posts, postId) => posts.find((post) => post.id === postId)
-);
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostById,
+  selectIds: selectPostByIds,
+} = postsEntity.getSelectors((state) => state.posts);
 
 export const selectPostsByUser = createSelector(
-  [selectPosts, (_, userId) => userId],
+  [selectAllPosts, (_, userId) => userId],
   (posts, userId) => posts.filter((post) => post.userId === Number(userId))
 );
 
